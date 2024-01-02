@@ -1,27 +1,33 @@
 import { useEffect, useState } from "react";
 import db from "./firebase";
-import { collection, getDocs } from "firebase/firestore";
+import { collection, getDocs, onSnapshot } from "firebase/firestore";
+import './App.css'
 
 function App() {
   const [posts, setPosts] = useState([])
   useEffect(() => { //data取得
-    getDocs(collection(db, "posts")).then((snapshot) => {
+    const postData = collection(db, 'posts')
+    getDocs(postData).then((snapshot) => {
       console.log(snapshot.docs.map(doc => doc.data()))
       setPosts(snapshot.docs.map((doc) => ({ ...doc.data() })))
+    })
+
+    onSnapshot(postData, (post) => {
+      setPosts(post.docs.map((doc) => ({ ...doc.data() })))
     })
   }, [])
 
   return (
     <div className="app">
-      {posts.map((post) => {
-        return (
-          <div>
-            <h1>{post.title}</h1>
-            <p>{post.text}</p>
-            <p>{post.timestamp}</p>
-          </div>
-        )
-      })}
+      <div>
+        {posts.map((post) => {
+          return (
+            <div keys={post.title}>
+              <h1>{post.title}</h1>
+              <p>{post.text}</p>
+            </div>
+          )
+        })}</div>
     </div>
   );
 }
